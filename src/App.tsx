@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import './App.scss';
 import { peopleFromServer } from './data/people';
 import classNames from 'classnames';
@@ -46,6 +46,7 @@ export const App: React.FC = () => {
               placeholder="Enter a part of the name"
               className="input"
               value={query}
+              // onBlur={() => setShowField(false)}
               onFocus={() => setShowField(true)}
               onChange={handleImput}
               data-cy="search-input"
@@ -59,7 +60,11 @@ export const App: React.FC = () => {
                   className="dropdown-item"
                   data-cy="suggestion-item"
                   key={person.slug}
-                  onClick={() => setselectdPersone(person)}
+                  onClick={() => {
+                    setselectdPersone(person);
+                    setShowField(false);
+                    setQuery('');
+                  }}
                 >
                   <p
                     className={classNames({
