@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import './App.scss';
 import { peopleFromServer } from './data/people';
 import classNames from 'classnames';
@@ -8,18 +8,20 @@ import debounce from 'lodash.debounce';
 export const App: React.FC = () => {
   const [query, setQuery] = useState('');
   const [appliedQuery, setAppliedQuery] = useState('');
+  const [showField, setShowField] = useState(false);
   const [selectdPersone, setselectdPersone] = useState<Person | null>(null);
 
-  const timeoutQuery = useCallback(debounce(setAppliedQuery, 2000), []);
+  const timeoutQuery = useMemo(() => debounce(setAppliedQuery, 300), []);
 
   const handleImput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
     timeoutQuery(e.target.value);
+    setselectdPersone(null);
   };
 
   const peopleToShow = peopleFromServer.filter(person => {
-    const nameLower = person.name.toLowerCase();
-    const queryLower = appliedQuery.toLowerCase();
+    const nameLower = person.name.toLowerCase().trim();
+    const queryLower = appliedQuery.toLowerCase().trim();
 
     return nameLower.includes(queryLower);
   });
@@ -35,7 +37,7 @@ export const App: React.FC = () => {
 
         <div
           className={classNames('dropdown', {
-            'is-active': query !== '' && peopleToShow.length !== 0,
+            'is-active': showField && peopleToShow.length !== 0,
           })}
         >
           <div className="dropdown-trigger">
@@ -44,6 +46,7 @@ export const App: React.FC = () => {
               placeholder="Enter a part of the name"
               className="input"
               value={query}
+              onFocus={() => setShowField(true)}
               onChange={handleImput}
               data-cy="search-input"
             />
